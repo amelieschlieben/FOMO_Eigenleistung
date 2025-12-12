@@ -1,0 +1,42 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: 'Online Disinhibition Effect: A formal model'
+message: >-
+  If you refer to this model, please cite it using the
+  metadata from this file. This theory has not been peer
+  reviewed yet.
+type: software
+authors:
+  - given-names: Martje
+    family-names: Buss
+    affiliation: Ludwig-Maximilians-Universität München
+    orcid: 'https://orcid.org/0000-0002-4190-0086'
+    email: martje.buss@psy.lmu.de
+  - given-names: Lara
+    family-names: Haas
+    email: lara.haas@campus.lmu.de
+    affiliation: Ludwig-Maximilians-Universität München
+  - given-names: 'Sofia '
+    family-names: Luchiean
+    email: sofia.luchiean@campus.lmu.de
+    affiliation: Ludwig-Maximilians-Universität München
+    orcid: 'https://orcid.org/0009-0009-6715-6097'
+  - given-names: Amelie
+    family-names: Schlieben
+    email: schlieben.am@campus.lmu.de
+    affiliation: Ludwig-Maximilians-Universität München
+repository-code: >-
+  https://github.com/amelieschlieben/Online-Disinhibition-Effect
+abstract: >-
+  A formal model that explains why individuals often behave
+  more intensely in online environments compared to
+  face-to-face situations
+keywords:
+  - online behavior
+  - formal theory
+  - computer-mediated communication
+license: CC-BY-4.0
+version: 0.1.0
+date-released: '2025-12-12'
