@@ -10,6 +10,7 @@ IC_function <- function(anonymity) {
 an <- c(0.2, 0.5, 0.8)
 IC_function(an)
 
+base_resp <- 0.8
 
 ### Identity Compartmentalization auf Felt Responsibility 
 FR_function <- function(comp, base_resp) {
@@ -18,7 +19,7 @@ FR_function <- function(comp, base_resp) {
 }
 
 # Überprüfung mit Vektor
-FR_function(an)
+FR_function(an,base_resp = 0.8)
 
 
 
@@ -60,7 +61,7 @@ curse_function <- function(anonymity, cues, MOD, base_resp) {
   concern <- CAI_function(cues)
   courage <- CE_function(concern)
   state_dis <- SD_function(feltresp, courage, MOD)
-  bad_sentence_percentage <- (state_dis + 0.1)/1.3 + rnorm(mean = 0, sd = 0.1)
+  bad_sentence_percentage <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.1)
   bad_sentence_percentage [bad_sentence_percentage > 1] <- 1
   bad_sentence_percentage [bad_sentence_percentage < 0] <- 0
   return(bad_sentence_percentage)
@@ -68,19 +69,19 @@ curse_function <- function(anonymity, cues, MOD, base_resp) {
 
 
 library(ggplot2)
+df <- expand.grid(
+  anonymity = c(0, 0.5, 1),
+  MOD = c(1, 3, 5),
+  cues = c(0, 0.5, 1),
+  base_resp = c(0.5, 0.9)
+)
 
-ggplot(df, aes(x = feltresp, y = state_dis, color = factor(courage), group = courage)) +
-  geom_line(size = 0.5) +
-  geom_point(size = 1) +
-  facet_wrap(~ MOD, labeller = label_both) +
-  labs(
-    x = "feltresp",
-    y = "state_dis",
-    color = "courage",
-    title = "Einfluss von feltresp auf state dis",
-    subtitle = "Parallele Linien für courage, getrennt nach MOD"
-  ) +
-  theme_minimal(base_size = 13)
+df$bad_sentence_percentage <- curse_function(df$anonymity, df$cues, df$MOD, df$base_resp)
+
+ggplot(df, aes(x= anonymity, y = bad_sentence_percentage, color = factor(cues))) +
+  facet_grid(MOD ~ base_resp) +
+  geom_point() + 
+  geom_line()
 
 
 
