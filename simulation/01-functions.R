@@ -1,8 +1,8 @@
 ##### Dissociative Anonymity
 
 ### Anonymity auf Identity Compartmentalization 
-IC_function <- function(AN) {
-  comp <- (AN^2)/(AN^2+(1-AN)^2)
+IC_function <- function(anonymity) {
+  comp <- (anonymity^2)/(anonymity^2+(1-anonymity)^2)
   return(comp)
 }
 
@@ -11,16 +11,11 @@ an <- c(0.2, 0.5, 0.8)
 IC_function(an)
 
 
-## Hier noch Modellparameter einfügen irgendwie
-m <- 0.8
-
-
 ### Identity Compartmentalization auf Felt Responsibility 
-FR_function <- function(comp, m) {
-  feltresp <- m *(1 - 0.8*comp)^3
+FR_function <- function(comp, base_resp) {
+  feltresp <- base_resp *(1 - 0.8*comp)^3
   return(feltresp)
 }
-
 
 # Überprüfung mit Vektor
 FR_function(an)
@@ -51,15 +46,25 @@ CE_function(an)
 
 
 
-#### Kernfunktion 
+##### Kernfunktion 
 SD_function <- function(feltresp, courage, MOD) {
   state_dis <- 0.2 * MOD + (-0.3) * feltresp + 0.2 * courage + (-0.1) * feltresp * courage
   return(state_dis)
 }
 
 
-SD_function(1, 0, 1)
-
+##### Combine atomic functions into one “super function”
+curse_function <- function(anonymity, cues, MOD, base_resp) {
+  comp <- IC_function(anonymity)
+  feltresp <- FR_function(comp, base_resp)
+  concern <- CAI_function(cues)
+  courage <- CE_function(concern)
+  state_dis <- SD_function(feltresp, courage, MOD)
+  bad_sentence_percentage <- (state_dis + 0.1)/1.3 + rnorm(mean = 0, sd = 0.1)
+  bad_sentence_percentage [bad_sentence_percentage > 1] <- 1
+  bad_sentence_percentage [bad_sentence_percentage < 0] <- 0
+  return(bad_sentence_percentage)
+}
 
 
 library(ggplot2)
