@@ -1,6 +1,6 @@
 source("simulation/01-functions.R")
 
-n = 100
+n = 2
 df <- expand.grid(
   id = 1:n,
   anonymity = c(0, 0.5, 1),
@@ -15,4 +15,9 @@ df$bad_sentence_percentage <- curse_function(df$anonymity, df$cues, df$MOD, df$b
 
 ggplot(df, aes(x= anonymity, y = bad_sentence_percentage, color = factor(cues))) +
   stat_summary(fun.data = mean_cl_normal, geom = "pointrange",
+               position = position_dodge(width = 0.1)) +
+  stat_summary(fun = mean, geom = "line",
                position = position_dodge(width = 0.1))
+
+
+df
