@@ -6,10 +6,11 @@ library(multcomp)
 
 ## Wir haben einen fit erstellt
 fit_lm <- lm(bad_sentence_percentage ~ anonymity * cues, data=df)
+summary(fit_lm)
 
 ## Nullhypothesen definieren (Richtung kann man nicht mischen, deshalb getrennt)
-hyps_less <- c("anonymity <=0", "anonymity:cues <= 0")
-hyp_greater <- c("cues >= 0")
+hyps_less <- c("anonymity <=0")
+hyp_greater <- c("cues >= 0", "anonymity:cues >= 0")
 
 ## glht Objekt erstellen 
 # für Nullhypothesen kleiner gleich
