@@ -1,6 +1,7 @@
 source("simulation/01-functions.R")
+set.seed(4)
 
-n = 10000
+n = 95
 df <- expand.grid(
   id = 1:n,
   anonymity = c(0, 0.5, 1),
