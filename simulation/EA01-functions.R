@@ -14,11 +14,6 @@ IC_function <- function(anonymity) {
   return(comp)
 }
 
-# Überprüfung mit Vektor
-an <- c(0.2, 0.5, 0.8)
-IC_function(an)
-
-base_resp <- 0.8
 
 #' Felt responsibility as a function of identity compartmentalization
 #'
@@ -33,14 +28,13 @@ base_resp <- 0.8
 #'
 #' @return The felt responsibility for the given parameters, on a scale from 0 to 1.
 
+base_resp <- 0.8
+
 FR_function <- function(comp, base_resp) {
   feltresp <- base_resp * (1 - 0.8 * comp)^3
   return(feltresp)
 }
 
-
-# Überprüfung mit Vektor
-FR_function(an,base_resp = 0.8)
 
 
 #' Calculate concern about impression on others from number of interpersonal cues
@@ -60,9 +54,6 @@ CAI_function <- function(cues) {
 }
 
 
-# Überprüfung mit Vektor
-CAI_function(an)
-
 
 #' Calculate courage to express oneself from concern about impression on others
 #'
@@ -79,8 +70,7 @@ CE_function <- function(concern) {
   return(courage)
 }
 
-# Überprüfung mit Vektor 
-CE_function(an)
+
 
 #' Calculate state disinhibition
 #'
@@ -97,15 +87,22 @@ CE_function(an)
 #'
 #' @return The state disinhibition score for the given parameters, on a scale from -0.1 to 1.2.
 
+# State Disinhibition
 SD_function <- function(feltresp, courage, MOD) {
-  state_dis <- 0.2 * MOD + (-0.3) * feltresp + 0.2 * courage + (-0.1) * feltresp * courage
+  state_dis <- 0.2 * MOD - 0.3 * feltresp + 0.2 * courage - 0.1 * feltresp * courage
+  # Transformation auf 0-1 Skala + leichter Noise
+  state_dis <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.1)
+  state_dis[state_dis > 1] <- 1
+  state_dis[state_dis < 0] <- 0
   return(state_dis)
 }
+  
 
-#' Calculate the percentage of sentences containing at least one curse word
+
+
+#' Calculate the degree of Self-Disclosure
 #'
-#' Transforms state disinhibition into an observed outcome with added
-#' noise and bounds the result to the interval [0, 1].
+#' Transforms state disinhibition into expert-rated levels of self-disclosre
 #'
 #' @param anonymity The degree of anonymity, on a scale from 0 to 1.
 #'                  
@@ -114,37 +111,91 @@ SD_function <- function(feltresp, courage, MOD) {
 #' @param MOD measure of online disinhibition (MOD), on a scale from 1 to 5.
 #'      
 #' @param base_resp The baseline felt responsibility when compartmentalization is zero,
-#'                  on a scale from 0 to 1.
+#'                  fixed to 0.8 based on heuristic considerations 
 #'
-#' @return The percentage of sentences containing at least one curse word for the given
-#'         parameters, as values on a scale from 0 to 1.
+#' @return observed level (low, medium, high) of self-disclosure in textual analyses
+#'
 
-curse_function <- function(anonymity, cues, MOD, base_resp) {
+# Self-Disclosure Kategorien
+selfdis_function <- function(anonymity, cues, MOD, base_resp) {
   comp <- IC_function(anonymity)
   feltresp <- FR_function(comp, base_resp)
   concern <- CAI_function(cues)
   courage <- CE_function(concern)
   state_dis <- SD_function(feltresp, courage, MOD)
-  bad_sentence_percentage <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.0)
-  bad_sentence_percentage[bad_sentence_percentage > 1] <- 1
-  bad_sentence_percentage[bad_sentence_percentage < 0] <- 0
-  return(bad_sentence_percentage)
+  
+  self_disclosure <- cut(
+    state_dis,
+    breaks = c(0, 0.4, 0.6, 1),
+    labels = c("low", "medium", "high"),
+    include.lowest = TRUE,
+    right = FALSE
+  )
+  return(self_disclosure)
 }
 
+
+
+##### Datenframe erstellen
 library(ggplot2)
+
 df <- expand.grid(
-  anonymity = c(0, 0.5, 1),
+  anonymity = seq(0, 1, 0.5), 
   MOD = c(1, 3, 5),
-  cues = c(0, 0.5, 1),
-  base_resp = c(0.5, 0.9)
+  cues = seq(0, 1, 0.5),
+  base_resp = 0.8
 )
 
-df$bad_sentence_percentage <- curse_function(df$anonymity, df$cues, df$MOD, df$base_resp)
 
-ggplot(df, aes(x= anonymity, y = bad_sentence_percentage, color = factor(cues))) +
-  facet_grid(MOD ~ base_resp) +
-  geom_point() + 
-  geom_line()
+# Zwischenwerte berechnen
+df$comp <- IC_function(df$anonymity)
+df$feltresp <- FR_function(df$comp, df$base_resp)
+df$concern <- CAI_function(df$cues)
+df$courage <- CE_function(df$concern)
+df$state_disinhibition <- SD_function(df$feltresp, df$courage, df$MOD)
+df$self_disclosure <- selfdis_function(df$anonymity, df$cues, df$MOD, df$base_resp)
+
+
+
+# Spalten sauber sortieren
+df <- df[, c("anonymity", "feltresp", "cues", "courage", "MOD", "state_disinhibition", "self_disclosure")]
+
+
+
+## PLOT STATE DISINHIBITION
+
+ggplot(df, aes(x = anonymity, y = state_disinhibition, color = as.factor(cues))) +
+  geom_point(size = 1.5) +
+  geom_line(aes(group = cues), size = 0.5) +
+  facet_wrap(~MOD) +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(color = "grey40", fill = NA, linewidth = 0.8)
+  ) +
+  scale_color_manual(name = "Interpersonal Cues", values = c("lightgreen", "orange", "darkred")) +
+  labs(
+    x = "Anonymität",
+    y = "State Disinhibition",
+    color = "Interpersonal Cues",
+    title = "State Disinhibition depending on Anonymity, Interpersonal Cues and MOD"
+  )
+
+
+
+
+### PLOT SELF-DISCLOSURE
+
+ggplot(df, aes(x = anonymity, y = cues, color = self_disclosure)) +
+  geom_point(size = 5) +
+  facet_wrap(~MOD) +
+  scale_color_manual(values = c("lightgreen", "orange", "darkred")) +
+  theme_minimal() +
+  labs(title = "Level of Self-Disclosure depending on Anonymity, Interpersonal Cues and MOD",
+       x = "Anonymity", 
+       y = "Interpersonal Cues") +
+  theme(
+    panel.border = element_rect(color = "grey40", fill = NA, linewidth = 0.8)
+  )
 
 
 

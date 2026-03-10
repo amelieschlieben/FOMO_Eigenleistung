@@ -1,10 +1,10 @@
 source("simulation/01-functions.R")
 set.seed(4)
 
-n = 95
+n = 10
 df <- expand.grid(
   id = 1:n,
-  anonymity = c(0, 0.5, 1),
+  anonymity = c(0,0.5, 1),
   cues = c(0, 0.5, 1)
 )
 df$MOD <- rbeta(nrow(df), 4, 4)*4 + 1
@@ -19,6 +19,8 @@ p1 = ggplot(df, aes(x= anonymity, y = bad_sentence_percentage, color = factor(cu
                position = position_dodge(width = 0.1)) +
   stat_summary(fun = mean, geom = "line",
                position = position_dodge(width = 0.1))
+
+
 
 print(p1)
 
