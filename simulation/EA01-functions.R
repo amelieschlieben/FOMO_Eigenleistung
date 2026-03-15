@@ -91,7 +91,7 @@ CE_function <- function(concern) {
 SD_function <- function(feltresp, courage, MOD) {
   state_dis <- 0.2 * MOD - 0.3 * feltresp + 0.2 * courage - 0.1 * feltresp * courage
   # Transformation auf 0-1 Skala + leichter Noise
-  state_dis <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.1)
+  state_dis <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.0)
   state_dis[state_dis > 1] <- 1
   state_dis[state_dis < 0] <- 0
   return(state_dis)
@@ -127,9 +127,8 @@ selfdis_function <- function(anonymity, cues, MOD, base_resp) {
   self_disclosure <- cut(
     state_dis,
     breaks = c(0, 0.4, 0.6, 1),
-    labels = c("low", "medium", "high"),
+    labels = c("no", "low", "high"),
     include.lowest = TRUE,
-    right = FALSE
   )
   return(self_disclosure)
 }
@@ -140,9 +139,9 @@ selfdis_function <- function(anonymity, cues, MOD, base_resp) {
 library(ggplot2)
 
 df <- expand.grid(
-  anonymity = seq(0, 1, 0.5), 
-  MOD = c(1, 3, 5),
-  cues = seq(0, 1, 0.5),
+  anonymity = seq(0, 1, 1), 
+  MOD = c(1, 5),
+  cues = seq(0, 1, 1),
   base_resp = 0.8
 )
 
@@ -163,36 +162,47 @@ df <- df[, c("anonymity", "feltresp", "cues", "courage", "MOD", "state_disinhibi
 
 
 ## PLOT STATE DISINHIBITION
-
 ggplot(df, aes(x = anonymity, y = state_disinhibition, color = as.factor(cues))) +
   geom_point(size = 1.5) +
-  geom_line(aes(group = cues), size = 0.5) +
+  geom_line(aes(group = cues), linewidth = 0.5) +
   facet_wrap(~MOD) +
   theme_minimal() +
+  scale_color_manual(
+    values = c(
+      "0" = "grey",
+      "1" = "black"
+    )
+  ) +
+  labs(
+    title = "State Disinhibition depending on Anonymity, Interpersonal Cues and MOD",
+    x = "Anonymity",
+    y = "State Disinhibition",
+    color = "Interpersonal Cues"
+  ) +
   theme(
     panel.border = element_rect(color = "grey40", fill = NA, linewidth = 0.8)
-  ) +
-  scale_color_manual(name = "Interpersonal Cues", values = c("lightgreen", "orange", "darkred")) +
-  labs(
-    x = "Anonymität",
-    y = "State Disinhibition",
-    color = "Interpersonal Cues",
-    title = "State Disinhibition depending on Anonymity, Interpersonal Cues and MOD"
   )
 
 
 
-
 ### PLOT SELF-DISCLOSURE
-
 ggplot(df, aes(x = anonymity, y = cues, color = self_disclosure)) +
   geom_point(size = 5) +
   facet_wrap(~MOD) +
-  scale_color_manual(values = c("lightgreen", "orange", "darkred")) +
+  scale_color_manual(
+    values = c(
+      "no" = "lightgray",
+      "low" = "darkgray",
+      "high" = "black"
+    )
+  ) +
   theme_minimal() +
-  labs(title = "Level of Self-Disclosure depending on Anonymity, Interpersonal Cues and MOD",
-       x = "Anonymity", 
-       y = "Interpersonal Cues") +
+  labs(
+    title = "Level of Self-Disclosure depending on Anonymity, Interpersonal Cues and MOD",
+    x = "Anonymity",
+    y = "Interpersonal Cues",
+    color = "Expert Rating of Self-Disclosure"
+  ) +
   theme(
     panel.border = element_rect(color = "grey40", fill = NA, linewidth = 0.8)
   )

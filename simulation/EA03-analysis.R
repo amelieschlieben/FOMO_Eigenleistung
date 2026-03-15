@@ -6,7 +6,7 @@ library("MASS")
 
 dfs$an_self_dis <- factor(
   dfs$self_disclosure, 
-  levels = c("low", "medium", "high"),
+  levels = c("no", "low", "high"),
   ordered = TRUE
 )
 
