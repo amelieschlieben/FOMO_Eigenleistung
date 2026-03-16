@@ -1,7 +1,7 @@
 source("simulation/EA01-functions.R")
 set.seed(4)
 
-n = 1000
+n = 100
 
 dfs <- expand.grid(
   id = 1:n,

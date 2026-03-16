@@ -14,6 +14,24 @@ model <- polr(an_self_dis ~ anonymity * cues,
               data = dfs,
               Hess = TRUE)
 
-summary(model)
+coefs <- coef(summary(model))
+## Werte e^beta (Odds Ratio)
 exp(coef(model))
+
+## Konfidenzintervalle 
 exp(confint(model))
+
+
+
+# Einzeltests
+z <- coefs[, "t value"]
+
+p_values <- c(
+  anonymity = pnorm(z["anonymity"], lower.tail = FALSE),
+  cues = pnorm(z["cues"], lower.tail = TRUE),
+  interaction = pnorm(z["anonymity:cues"], lower.tail = FALSE)
+)
+
+p_values
+
+

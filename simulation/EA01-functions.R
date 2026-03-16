@@ -90,13 +90,9 @@ CE_function <- function(concern) {
 # State Disinhibition
 SD_function <- function(feltresp, courage, MOD) {
   state_dis <- 0.2 * MOD - 0.3 * feltresp + 0.2 * courage - 0.1 * feltresp * courage
-  # Transformation auf 0-1 Skala + leichter Noise
-  state_dis <- (state_dis + 0.1)/1.3 + rnorm(length(state_dis), mean = 0, sd = 0.0)
-  state_dis[state_dis > 1] <- 1
-  state_dis[state_dis < 0] <- 0
+  state_dis <- (state_dis + 0.1)/1.3
   return(state_dis)
 }
-  
 
 
 
@@ -123,13 +119,20 @@ selfdis_function <- function(anonymity, cues, MOD, base_resp) {
   concern <- CAI_function(cues)
   courage <- CE_function(concern)
   state_dis <- SD_function(feltresp, courage, MOD)
+
+  # Hinzufügen von noise
+  latent_sd <- state_dis + rnorm(length(state_dis), mean = 0, sd = 0.1)
+  
+  latent_sd[latent_sd > 1] <- 1
+  latent_sd[latent_sd < 0] <- 0
   
   self_disclosure <- cut(
-    state_dis,
+    latent_sd,
     breaks = c(0, 0.4, 0.6, 1),
     labels = c("no", "low", "high"),
-    include.lowest = TRUE,
+    include.lowest = TRUE
   )
+  
   return(self_disclosure)
 }
 
