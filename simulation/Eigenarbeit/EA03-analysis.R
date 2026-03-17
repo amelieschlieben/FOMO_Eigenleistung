@@ -4,15 +4,16 @@ source("simulation/Eigenarbeit/EA02-simulations.R")
 install.packages("MASS")
 library("MASS")
 
-dfs$an_self_dis <- factor(
+dfs$self_disclosure <- factor(
   dfs$self_disclosure, 
   levels = c("no", "low", "high"),
   ordered = TRUE
 )
 
-model <- polr(an_self_dis ~ anonymity * cues,
+model <- polr(self_disclosure ~ anonymity * cues,
               data = dfs,
               Hess = TRUE)
+
 
 coefs <- coef(summary(model))
 ## Werte e^beta (Odds Ratio)

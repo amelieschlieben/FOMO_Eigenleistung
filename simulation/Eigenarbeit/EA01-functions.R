@@ -121,7 +121,7 @@ selfdis_function <- function(anonymity, cues, MOD, base_resp) {
   state_dis <- SD_function(feltresp, courage, MOD)
 
   # Hinzufügen von noise
-  latent_sd <- state_dis + rnorm(length(state_dis), mean = 0, sd = 0.1)
+  latent_sd <- state_dis + rnorm(length(state_dis), mean = 0, sd = 0.3)
   
   latent_sd[latent_sd > 1] <- 1
   latent_sd[latent_sd < 0] <- 0
