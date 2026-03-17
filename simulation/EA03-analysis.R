@@ -29,8 +29,7 @@ z <- coefs[, "t value"]
 p_values <- c(
   anonymity = pnorm(z["anonymity"], lower.tail = FALSE),
   cues = pnorm(z["cues"], lower.tail = TRUE),
-  interaction = pnorm(z["anonymity:cues"], lower.tail = FALSE)
-)
+  interaction = 2 * pnorm(abs(z["anonymity:cues"]), lower.tail = FALSE))
 
 p_values
 
