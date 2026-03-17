@@ -1,4 +1,4 @@
-source("simulation/EA02-simulations.R")
+source("simulation/Eigenarbeit/EA02-simulations.R")
 
 ### Paket für ordinale logistische Regression installieren und laden
 install.packages("MASS")

@@ -1,3 +1,7 @@
+## Version 1.0.0
+- submission of the report
+
+
 ## Version 0.4.0
 -   changed outcome to Self-Disclosure as part of the individual work
 

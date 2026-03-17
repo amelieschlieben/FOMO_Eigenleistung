@@ -1,4 +1,4 @@
-source("simulation/EA01-functions.R")
+source("simulation/Eigenarbeit/EA01-functions.R")
 set.seed(4)
 
 n = 100
@@ -32,6 +32,8 @@ dfs$self_disclosure <- selfdis_function(
 )
 
 
+## Rohdaten abspeichern
+write.csv(dfs, "dfs", row.names = FALSE)
 
 
 library(dplyr)
